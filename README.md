@@ -34,4 +34,4 @@ Built by Thomas Mulreid. These are the free version of how I work with revenue t
 
 ## License
 
-MIT — use them, fork them, adapt them. Attribution appreciated, not required.
+Licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — use them, fork them, adapt them, even commercially. Just keep the credit: attribution to Thomas Mulreid is required. See the [LICENSE](LICENSE) file.
