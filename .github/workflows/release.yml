@@ -1,0 +1,41 @@
+name: Release
+
+# Publishes a release with a fresh zip for every skill attached.
+#
+# To cut a release, push a tag:
+#
+#     git tag v1.1 && git push origin v1.1
+#
+# ...or use "Run workflow" on the Actions tab and type a tag name.
+# The zips are rebuilt from source first, so a release can never ship a
+# stale download.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v1.1)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild zips from source
+        run: ./build.sh
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$TAG" ./*.zip \
+            --title "Agentic GTM Operations $TAG" \
+            --generate-notes

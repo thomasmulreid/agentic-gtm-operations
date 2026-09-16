@@ -1,6 +1,6 @@
 # Make these skills yours
 
-The three skills work the moment you install them, on sensible generic defaults. But they get sharp when they know your company, your product, and your market. This takes about five minutes per skill — less if you use the paste-in prompt at the bottom.
+The four skills work the moment you install them, on sensible generic defaults. But they get sharp when they know your company, your product, and your market. This takes about five minutes per skill — less if you use the paste-in prompt at the bottom.
 
 There are two ways to do it. Pick one.
 
@@ -50,6 +50,20 @@ Each skill's customization lives in one file. Open it, edit it, save it. Details
 **Paste-in prompt (Option A):**
 
 > I've installed the account-nurture skill. Before I use it on a real account, learn my context: my company website is [URL] — read it and tell me back what you understand I can sell, so we're aligned. Then ask me which connectors I have available (CRM, email, Slack) so you know what you can pull from. Once that's set, I'll give you an account to nurture.
+
+---
+
+## deal-coach
+
+**What to customize:** nothing in a file — this one tunes itself to the deal in front of it. What changes the quality of the review is what you give it and what it can reach.
+
+1. **Your deal material.** Paste notes, a call summary, or a CRM export. The review is only as honest as the input; a thin paste gets a thorough challenge round rather than a confident-sounding report.
+2. **Your connectors.** If a CRM, email, or call-notes tool is connected to Claude, the skill pulls from those first and goes deeper. Without them it works from what you paste and tells you what it couldn't assess.
+3. **Your qualification bar.** If you've run `icp-definer` or tuned `gtm-qualification`, say so — the coach can judge fit against your rubric instead of a generic one.
+
+**Paste-in prompt (Option A):**
+
+> I've installed the deal-coach skill. Before I bring you a live deal, learn my context: we sell [one sentence]. Our sales stages are [list them] and a deal is typically [length] with [who] involved on the buyer side. Ask me what our usual competitors are, what our most common loss reason is, and which connectors I have available (CRM, email, call notes). Then tell me back what you'll pressure-test hardest for deals like mine, so I know what to expect before I paste a real one in.
 
 ---
 
