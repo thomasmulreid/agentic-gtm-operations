@@ -21,6 +21,8 @@ Pull requests run the same check in read-only mode and fail if a zip is out of d
 
 If you'd rather rebuild locally, run `./build.sh`. Use `./build.sh --check` to see whether anything is out of date without changing files.
 
+"Out of date" means the *files inside* the zip differ from the files in the folder — not that the zip bytes differ. Those are different questions: macOS and Linux ship different `zip` builds that write different archive headers and pack files in a different order, so an identical zip built on a Mac and on a GitHub runner won't match byte-for-byte. Comparing bytes would make every zip look stale as soon as it crossed platforms, and the local build and the CI build would overwrite each other forever.
+
 ## 3. Cutting a release
 
 The [Releases](../../releases) page is where the README points people, so it's worth keeping current. To publish one, push a tag:
