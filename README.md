@@ -28,6 +28,10 @@ Repeat per skill if you want more than one.
 
 These ship generic and work on install. To tune them to your company, product, and market — including a paste-in prompt that has Claude interview you and rewrite the config in a few minutes — see **[CUSTOMIZE.md](CUSTOMIZE.md)**.
 
+## Forking or contributing
+
+Each skill's folder is the source of truth; the `.zip` beside it is built from that folder automatically on every push. See **[MAINTAINING.md](MAINTAINING.md)**.
+
 ## Who made these
 
 Built by Thomas Mulreid. These are the free version of how I work with revenue teams. If you want them wired to your actual stack — your CRM fields, your data, your motion — that's a different build than a config edit, and it's what I do. [Reach me on LinkedIn.](https://www.linkedin.com/in/thomasmulreid/)
