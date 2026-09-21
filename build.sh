@@ -2,13 +2,17 @@
 #
 # Rebuilds the installable .zip for every skill in this repo.
 #
-#   ./build.sh          rebuild the zips
+#   ./build.sh          rebuild any zip whose contents no longer match its folder
 #   ./build.sh --check   don't write anything; exit 1 if any zip is out of date
 #
 # A "skill" is any top-level directory containing a SKILL.md.
-# Zips are built with a fixed timestamp so that identical content always
-# produces an identical file — rebuilding when nothing changed is a no-op,
-# and git stays quiet.
+#
+# "Out of date" means the files inside the zip differ from the files in the
+# folder. It deliberately does NOT mean the zip bytes differ: macOS and Linux
+# ship different `zip` builds that write different archive headers and walk
+# directories in a different order, so two archives with identical contents
+# are routinely not byte-identical. Comparing bytes would make every zip look
+# stale the moment it was built on the other platform.
 
 set -euo pipefail
 
@@ -17,38 +21,52 @@ cd "$(dirname "$0")"
 CHECK_ONLY=false
 [[ "${1:-}" == "--check" ]] && CHECK_ONLY=true
 
+# Packed files get a fixed timestamp and a sorted order so that rebuilding on
+# the same machine twice produces the same bytes, and git stays quiet.
 FIXED_TIMESTAMP="202001010000"
+JUNK=( -name '.DS_Store' -o -name '._*' )
+
 stale=0
 built=0
 
-staging="$(mktemp -d)"
-trap 'rm -rf "$staging"' EXIT
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
 
 for skill_md in */SKILL.md; do
   skill="$(dirname "$skill_md")"
   zip_file="${skill}.zip"
 
-  # Copy to staging, drop junk, and flatten timestamps for reproducibility.
-  rm -rf "${staging:?}/${skill}"
-  cp -R "$skill" "$staging/$skill"
-  find "$staging/$skill" \( -name '.DS_Store' -o -name '._*' \) -delete
-  find "$staging/$skill" -exec touch -t "$FIXED_TIMESTAMP" {} +
+  # A clean copy of the folder — what the zip is supposed to contain.
+  src="$work/src"
+  rm -rf "$src"
+  mkdir -p "$src"
+  cp -R "$skill" "$src/$skill"
+  find "$src/$skill" \( "${JUNK[@]}" \) -delete
 
-  (cd "$staging" && zip -rqX "${skill}.new.zip" "$skill")
-
-  if [[ -f "$zip_file" ]] && cmp -s "$zip_file" "$staging/${skill}.new.zip"; then
-    echo "  ok       $zip_file"
-    continue
+  # Compare against what the committed zip actually holds.
+  if [[ -f "$zip_file" ]]; then
+    packed="$work/packed"
+    rm -rf "$packed"
+    mkdir -p "$packed"
+    if unzip -qo "$zip_file" -d "$packed" 2>/dev/null &&
+       diff -r "$src/$skill" "$packed/$skill" >/dev/null 2>&1; then
+      echo "  ok       $zip_file"
+      continue
+    fi
   fi
 
   if $CHECK_ONLY; then
     echo "  STALE    $zip_file  (run ./build.sh)"
     stale=$((stale + 1))
-  else
-    mv "$staging/${skill}.new.zip" "$zip_file"
-    echo "  rebuilt  $zip_file"
-    built=$((built + 1))
+    continue
   fi
+
+  find "$src/$skill" -exec touch -t "$FIXED_TIMESTAMP" {} +
+  rm -f "$work/out.zip"
+  (cd "$src" && find "$skill" -print0 | sort -z | xargs -0 zip -qX "$work/out.zip")
+  mv "$work/out.zip" "$zip_file"
+  echo "  rebuilt  $zip_file"
+  built=$((built + 1))
 done
 
 if $CHECK_ONLY; then
